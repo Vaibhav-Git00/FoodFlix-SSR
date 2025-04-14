@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "title": "Top 10 Food Trends",
+    "summary": "Discover the latest food trends of 2023.",
+    "author": "John Doe",
+    "date": "2023-01-15",
+    "image": "/images/blog1.jpg"
+  },
+  {
+    "id": 2,
+    "title": "5 Easy Recipes",
+    "summary": "Quick and easy recipes for busy people.",
+    "author": "Jane Smith",
+    "date": "2023-02-10",
+    "image": "/images/blog2.jpg"
+  }
+]

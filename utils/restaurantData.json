@@ -1,0 +1,20 @@
+[
+  {
+    "name": "The Taj Hotel",
+    "cuisine": "Chinese",
+    "rating": "4.8",
+    "location": "Mumbai",
+    "status": "Open",
+    "image": "https://imgs.search.brave.com/z4DdikVS85kqLtWtdWvh_c_und-fVsjZpF83EiYKAf4/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTIz/MTUwNTA1NC9waG90/by90b3BzaG90LWEt/Y291cGxlLXBvc2Vz/LWZvci1waG90b2dy/YXBocy1pbi1mcm9u/dC1vZi10aGUtdGFq/LW1haGFsLWhvdGVs/LWluLW11bWJhaS1v/bi1tYXJjaC00Lmpw/Zz9zPTYxMng2MTIm/dz0wJms9MjAmYz1D/TWg3TWR2akkycXNZ/M2ZsTmZ3MDR4akw5/Qnl4SFJLRDJQRVNX/MTlfVkRvPQ",
+    "id": 2
+  },
+  {
+    "name": "Alfaradoo",
+    "cuisine": "South Indian",
+    "rating": "4.6",
+    "location": "Goa",
+    "status": "Closed",
+    "image": "https://imgs.search.brave.com/wgjpX0Ax3CgL_jUD1H9WK_368S4uNu63ICgnyfk-_wU/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/ZnJlZS1waG90by9y/ZXN0YXVyYW50LWlu/dGVyaW9yXzExMjct/MzM5NC5qcGc_c2Vt/dD1haXNfaHlicmlk/Jnc9NzQw",
+    "id": 3
+  }
+]

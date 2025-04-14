@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Pizza Palace",
+    "cuisine": "Italian",
+    "rating": 4.5,
+    "location": "Downtown",
+    "status": "Open",
+    "image": "/images/pizza.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Sushi World",
+    "cuisine": "Japanese",
+    "rating": 4.8,
+    "location": "Uptown",
+    "status": "Closed",
+    "image": "/images/sushi.jpg"
+  },
+  {
+    "name": "Taj Hotel",
+    "cuisine": "Chinese ",
+    "rating": "4.4",
+    "location": "Mumbai",
+    "status": "Open",
+    "image": "https://imgs.search.brave.com/z4DdikVS85kqLtWtdWvh_c_und-fVsjZpF83EiYKAf4/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTIz/MTUwNTA1NC9waG90/by90b3BzaG90LWEt/Y291cGxlLXBvc2Vz/LWZvci1waG90b2dy/YXBocy1pbi1mcm9u/dC1vZi10aGUtdGFq/LW1haGFsLWhvdGVs/LWluLW11bWJhaS1v/bi1tYXJjaC00Lmpw/Zz9zPTYxMng2MTIm/dz0wJms9MjAmYz1D/TWg3TWR2akkycXNZ/M2ZsTmZ3MDR4akw5/Qnl4SFJLRDJQRVNX/MTlfVkRvPQ",
+    "id": 3
+  }
+]

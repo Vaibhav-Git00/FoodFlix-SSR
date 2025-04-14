@@ -1,0 +1,21 @@
+[
+  {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "Admin",
+    "avatar": "/images/avatar1.jpg"
+  },
+  {
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "role": "Customer",
+    "avatar": "/images/avatar2.jpg"
+  },
+  {
+    "name": "Vaibhav",
+    "email": "itsvaibhav002@gmail.com",
+    "role": "Admin",
+    "avatar": "https://imgs.search.brave.com/B7WCloxlq8FtauntE8zHvpWRsZh2ThX7jIEFrNRYiMU/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9ncmF2/YXRhci5jb20vaW1h/Z2VzL2hvbWVwYWdl/L2F2YXRhci0wMS5w/bmc",
+    "id": null
+  }
+]

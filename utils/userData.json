@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Vaibhav ",
+    "email": "itsvaibhav002@gmail.com",
+    "role": "Admin",
+    "avatar": "https://imgs.search.brave.com/omyFSTmQH6cFJkNDbfgSJGejjiSLMMJUf5IjMOBlApk/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/ZnJlZS1waG90by9w/b3J0cmFpdC1oYW5k/c29tZS1iZWFyZGVk/LW1hbi1vdXRzaWRl/XzIzLTIxNTAyNjY5/MTUuanBnP3NlbXQ9/YWlzX2h5YnJpZA",
+    "id": 3
+  },
+  {
+    "name": "Gaurav",
+    "email": "gaurav00@gmail.com",
+    "role": "Customer",
+    "avatar": "https://imgs.search.brave.com/zkRV3LMV20_wSuvy9IMFB1jYPaxSLG33yMwOjGLQuUw/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/cGl4YWJheS5jb20v/cGhvdG8vMjAxNS8w/OC8wNS8wNC8yNS9w/ZW9wbGUtODc1NjE3/XzY0MC5qcGc",
+    "id": 4
+  }
+]
