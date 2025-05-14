@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const hbs = require('hbs');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 
 // Load environment variables
 dotenv.config();
@@ -14,6 +16,10 @@ connectDB();
 const foodBlogRoutes = require('./routes/foodBlogRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const userRoutes = require('./routes/userRoutes');
+const menuItemRoutes = require('./routes/menuItemRoutes');
+const cartRoutes = require('./routes/cartRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const menuItemAddRoutes = require('./routes/menuItemAddRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -63,12 +69,38 @@ hbs.registerHelper('decimal', function(num) {
 hbs.registerHelper('formatNumber', function(num, decimals) {
   return num.toFixed(decimals);
 });
+hbs.registerHelper('multiply', function(a, b) {
+  return (a * b).toFixed(2);
+});
+hbs.registerHelper('calculateTax', function(subtotal) {
+  return (subtotal * 0.08).toFixed(2);
+});
+hbs.registerHelper('calculateTotal', function(subtotal, deliveryFee) {
+  return (subtotal + (deliveryFee || 0) + (subtotal * 0.08)).toFixed(2);
+});
+hbs.registerHelper('gt', function(a, b) {
+  return a > b;
+});
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded form data
 app.use(bodyParser.json()); // Parse JSON data
 app.use(express.json()); // Parse JSON requests
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Session middleware
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'foodflix_secret_key',
+  resave: false,
+  saveUninitialized: true,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/Food',
+    ttl: 14 * 24 * 60 * 60 // 14 days
+  }),
+  cookie: {
+    maxAge: 14 * 24 * 60 * 60 * 1000 // 14 days in milliseconds
+  }
+}));
 
 // Debug middleware for logging requests
 app.use((req, res, next) => {
@@ -104,6 +136,10 @@ app.get('/', async (req, res) => {
 app.use('/foodblogs', foodBlogRoutes);
 app.use('/restaurants', restaurantRoutes);
 app.use('/users', userRoutes);
+app.use('/menu', menuItemRoutes);
+app.use('/cart', cartRoutes);
+app.use('/orders', orderRoutes);
+app.use('/add-menu-item', menuItemAddRoutes);
 
 // 404 handler
 app.use((req, res) => {

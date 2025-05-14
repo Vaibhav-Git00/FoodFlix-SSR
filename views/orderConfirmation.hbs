@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .confirmation-header {
+      text-align: center;
+      padding: 30px 0;
+    }
+    .confirmation-icon {
+      font-size: 5rem;
+      color: #198754;
+      margin-bottom: 20px;
+    }
+    .order-status {
+      padding: 10px 20px;
+      border-radius: 30px;
+      display: inline-block;
+      font-weight: bold;
+    }
+    .status-confirmed {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+    .timeline {
+      position: relative;
+      padding-left: 30px;
+      margin-top: 20px;
+    }
+    .timeline-item {
+      position: relative;
+      padding-bottom: 30px;
+    }
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -30px;
+      top: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #198754;
+      z-index: 1;
+    }
+    .timeline-item::after {
+      content: '';
+      position: absolute;
+      left: -21px;
+      top: 20px;
+      width: 2px;
+      height: calc(100% - 20px);
+      background-color: #dee2e6;
+    }
+    .timeline-item:last-child::after {
+      display: none;
+    }
+    .timeline-item.active::before {
+      background-color: #198754;
+    }
+    .timeline-item.pending::before {
+      background-color: #dee2e6;
+    }
+    .timeline-content {
+      padding-left: 10px;
+    }
+    .order-details-card {
+      border-left: 4px solid #198754;
+    }
+  </style>
+</head>
+<body>
+  {{> navbar}}
+  
+  <div class="container mt-4 mb-5">
+    <div class="confirmation-header">
+      <i class="fas fa-check-circle confirmation-icon"></i>
+      <h1 class="mb-3">Order Confirmed!</h1>
+      <p class="lead">Thank you for your order. Your food is being prepared.</p>
+      <div class="order-status status-confirmed">
+        <i class="fas fa-spinner fa-spin me-2"></i> {{order.status}}
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Order #{{order._id}}</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+              <div>
+                <p class="mb-1"><strong>Restaurant:</strong> {{order.restaurant.name}}</p>
+                <p class="mb-1"><strong>Order Type:</strong> {{order.orderType}}</p>
+                <p class="mb-1"><strong>Order Date:</strong> {{orderDate}}</p>
+              </div>
+              <div>
+                <p class="mb-1"><strong>Payment Method:</strong> {{order.paymentMethod}}</p>
+                <p class="mb-1"><strong>Payment Status:</strong> <span class="badge bg-success">{{order.paymentStatus}}</span></p>
+                <p class="mb-1"><strong>Transaction ID:</strong> {{order.transactionId}}</p>
+              </div>
+            </div>
+            
+            {{#if (eq order.orderType "Delivery")}}
+              <div class="mb-3">
+                <h6>Delivery Address:</h6>
+                <p class="mb-1">{{order.deliveryAddress.street}}</p>
+                <p class="mb-1">{{order.deliveryAddress.city}}, {{order.deliveryAddress.state}} {{order.deliveryAddress.zipCode}}</p>
+                {{#if order.deliveryAddress.specialInstructions}}
+                  <p class="mb-1"><small class="text-muted">Special Instructions: {{order.deliveryAddress.specialInstructions}}</small></p>
+                {{/if}}
+              </div>
+            {{/if}}
+            
+            <h6>Order Items:</h6>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th class="text-end">Price</th>
+                    <th class="text-end">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each order.items}}
+                    <tr>
+                      <td>
+                        {{this.name}}
+                        {{#if this.specialInstructions}}
+                          <br><small class="text-muted">Note: {{this.specialInstructions}}</small>
+                        {{/if}}
+                      </td>
+                      <td>{{this.quantity}}</td>
+                      <td class="text-end">${{this.price}}</td>
+                      <td class="text-end">${{multiply this.price this.quantity}}</td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                    <td class="text-end">${{order.subtotal}}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="3" class="text-end">Tax:</td>
+                    <td class="text-end">${{order.taxAmount}}</td>
+                  </tr>
+                  {{#if (gt order.deliveryFee 0)}}
+                    <tr>
+                      <td colspan="3" class="text-end">Delivery Fee:</td>
+                      <td class="text-end">${{order.deliveryFee}}</td>
+                    </tr>
+                  {{/if}}
+                  {{#if (gt order.tipAmount 0)}}
+                    <tr>
+                      <td colspan="3" class="text-end">Tip:</td>
+                      <td class="text-end">${{order.tipAmount}}</td>
+                    </tr>
+                  {{/if}}
+                  <tr>
+                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                    <td class="text-end"><strong>${{order.totalAmount}}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            
+            {{#if order.orderNotes}}
+              <div class="mt-3">
+                <h6>Order Notes:</h6>
+                <p>{{order.orderNotes}}</p>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+          <a href="/restaurants" class="btn btn-outline-primary">
+            <i class="fas fa-utensils me-2"></i> Order More Food
+          </a>
+          <a href="/orders/track/{{order._id}}" class="btn btn-success">
+            <i class="fas fa-map-marker-alt me-2"></i> Track Order
+          </a>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Order Status</h5>
+          </div>
+          <div class="card-body">
+            <div class="timeline">
+              <div class="timeline-item active">
+                <div class="timeline-content">
+                  <h6>Order Placed</h6>
+                  <p class="text-muted mb-0">{{orderDate}}</p>
+                </div>
+              </div>
+              <div class="timeline-item active">
+                <div class="timeline-content">
+                  <h6>Order Confirmed</h6>
+                  <p class="text-muted mb-0">Your order has been confirmed</p>
+                </div>
+              </div>
+              <div class="timeline-item pending">
+                <div class="timeline-content">
+                  <h6>Preparing</h6>
+                  <p class="text-muted mb-0">Your food is being prepared</p>
+                </div>
+              </div>
+              {{#if (eq order.orderType "Delivery")}}
+                <div class="timeline-item pending">
+                  <div class="timeline-content">
+                    <h6>Out for Delivery</h6>
+                    <p class="text-muted mb-0">Your food is on the way</p>
+                  </div>
+                </div>
+                <div class="timeline-item pending">
+                  <div class="timeline-content">
+                    <h6>Delivered</h6>
+                    <p class="text-muted mb-0">Enjoy your meal!</p>
+                  </div>
+                </div>
+              {{else if (eq order.orderType "Pickup")}}
+                <div class="timeline-item pending">
+                  <div class="timeline-content">
+                    <h6>Ready for Pickup</h6>
+                    <p class="text-muted mb-0">Your food is ready for pickup</p>
+                  </div>
+                </div>
+                <div class="timeline-item pending">
+                  <div class="timeline-content">
+                    <h6>Completed</h6>
+                    <p class="text-muted mb-0">Enjoy your meal!</p>
+                  </div>
+                </div>
+              {{else}}
+                <div class="timeline-item pending">
+                  <div class="timeline-content">
+                    <h6>Ready to Serve</h6>
+                    <p class="text-muted mb-0">Your food is ready to be served</p>
+                  </div>
+                </div>
+                <div class="timeline-item pending">
+                  <div class="timeline-content">
+                    <h6>Completed</h6>
+                    <p class="text-muted mb-0">Enjoy your meal!</p>
+                  </div>
+                </div>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+        
+        <div class="card order-details-card">
+          <div class="card-body">
+            <h5 class="card-title">Estimated {{#if (eq order.orderType "Delivery")}}Delivery{{else if (eq order.orderType "Pickup")}}Pickup{{else}}Serving{{/if}} Time</h5>
+            <p class="card-text">
+              <i class="fas fa-clock text-success me-2"></i>
+              {{#if order.estimatedDeliveryTime}}
+                {{formatDate order.estimatedDeliveryTime}}
+              {{else}}
+                30-45 minutes
+              {{/if}}
+            </p>
+            
+            <hr>
+            
+            <h5 class="card-title">Need Help?</h5>
+            <p class="card-text">If you have any questions about your order, please contact us:</p>
+            <p class="mb-1"><i class="fas fa-phone-alt me-2"></i> (123) 456-7890</p>
+            <p class="mb-0"><i class="fas fa-envelope me-2"></i> support@foodflix.com</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  {{> footer}}
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

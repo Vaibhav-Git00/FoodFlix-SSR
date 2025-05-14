@@ -28,8 +28,11 @@
                 {{this.status}}
               </span>
               <div class="d-flex justify-content-between mt-3">
-                <a href="/restaurants/edit/{{this.id}}" class="btn btn-warning btn-sm">Edit</a>
-                <a href="/restaurants/delete/{{this.id}}" class="btn btn-danger btn-sm">Delete</a>
+                <a href="/restaurants/{{this._id}}/menu" class="btn btn-primary btn-sm">View Menu</a>
+                <div>
+                  <a href="/restaurants/edit/{{this._id}}" class="btn btn-warning btn-sm">Edit</a>
+                  <a href="/restaurants/delete/{{this._id}}" class="btn btn-danger btn-sm">Delete</a>
+                </div>
               </div>
             </div>
           </div>

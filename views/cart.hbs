@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .quantity-control {
+      display: flex;
+      align-items: center;
+    }
+    .quantity-btn {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      cursor: pointer;
+    }
+    .quantity-input {
+      width: 40px;
+      text-align: center;
+      border: none;
+      background: transparent;
+    }
+    .cart-item {
+      transition: all 0.3s ease;
+    }
+    .cart-item:hover {
+      background-color: #f8f9fa;
+    }
+    .empty-cart {
+      text-align: center;
+      padding: 50px 0;
+    }
+    .empty-cart i {
+      font-size: 5rem;
+      color: #dee2e6;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  {{> navbar}}
+  
+  <div class="container mt-4 mb-5">
+    <h1 class="mb-4">Your Cart</h1>
+    
+    {{#if isEmpty}}
+      <div class="empty-cart">
+        <i class="fas fa-shopping-cart"></i>
+        <h3>Your cart is empty</h3>
+        <p class="text-muted">Add items from restaurants to get started</p>
+        <a href="/restaurants" class="btn btn-primary mt-3">Browse Restaurants</a>
+      </div>
+    {{else}}
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Items from {{cart.restaurantInfo.name}}</h5>
+              <button class="btn btn-sm btn-outline-danger" id="clear-cart-btn">
+                <i class="fas fa-trash-alt me-1"></i> Clear Cart
+              </button>
+            </div>
+            <div class="card-body">
+              {{#each cart.items}}
+                <div class="cart-item mb-3 pb-3 border-bottom" data-item-id="{{this._id}}">
+                  <div class="row align-items-center">
+                    <div class="col-md-2">
+                      <img src="{{this.menuItem.image}}" alt="{{this.name}}" class="img-fluid rounded">
+                    </div>
+                    <div class="col-md-4">
+                      <h5>{{this.name}}</h5>
+                      <p class="text-muted mb-0">{{this.menuItem.description}}</p>
+                      {{#if this.specialInstructions}}
+                        <small class="text-muted">Note: {{this.specialInstructions}}</small>
+                      {{/if}}
+                    </div>
+                    <div class="col-md-2 text-center">
+                      <div class="quantity-control">
+                        <span class="quantity-btn decrease-btn">-</span>
+                        <input type="text" class="quantity-input" value="{{this.quantity}}" readonly>
+                        <span class="quantity-btn increase-btn">+</span>
+                      </div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                      <span class="price">${{this.price}}</span>
+                    </div>
+                    <div class="col-md-2 text-end">
+                      <span class="item-total">${{multiply this.price this.quantity}}</span>
+                      <button class="btn btn-sm text-danger remove-item-btn ms-2">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Order Summary</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Subtotal:</span>
+                <span>${{cart.subtotal}}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Delivery Fee:</span>
+                <span>${{cart.restaurantInfo.deliveryInfo.deliveryFee}}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Tax (8%):</span>
+                <span>${{calculateTax cart.subtotal}}</span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between mb-3">
+                <strong>Total:</strong>
+                <strong>${{calculateTotal cart.subtotal cart.restaurantInfo.deliveryInfo.deliveryFee}}</strong>
+              </div>
+              
+              <a href="/orders/checkout" class="btn btn-success w-100">
+                <i class="fas fa-shopping-bag me-2"></i> Proceed to Checkout
+              </a>
+              
+              <div class="mt-3">
+                <a href="/restaurants" class="btn btn-outline-primary w-100">
+                  <i class="fas fa-plus-circle me-2"></i> Add More Items
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{/if}}
+  </div>
+  
+  {{> footer}}
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Helper function to format currency
+    function formatCurrency(amount) {
+      return '$' + parseFloat(amount).toFixed(2);
+    }
+    
+    // Update cart item quantity
+    function updateCartItem(itemId, quantity) {
+      fetch('/cart/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ itemId, quantity })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update cart count in navbar
+          document.getElementById('cart-count').textContent = data.cartItemCount;
+          
+          // If cart is empty, reload the page
+          if (data.isEmpty) {
+            window.location.reload();
+          }
+        } else {
+          alert('Error updating cart: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the cart');
+      });
+    }
+    
+    // Remove item from cart
+    function removeCartItem(itemId) {
+      fetch(`/cart/remove/${itemId}`, {
+        method: 'DELETE'
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update cart count in navbar
+          document.getElementById('cart-count').textContent = data.cartItemCount;
+          
+          // Remove item from DOM
+          const itemElement = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+          if (itemElement) {
+            itemElement.remove();
+          }
+          
+          // If cart is empty, reload the page
+          if (data.isEmpty) {
+            window.location.reload();
+          }
+        } else {
+          alert('Error removing item: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while removing the item');
+      });
+    }
+    
+    // Clear cart
+    function clearCart() {
+      if (confirm('Are you sure you want to clear your cart?')) {
+        fetch('/cart/clear', {
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Reload the page
+            window.location.reload();
+          } else {
+            alert('Error clearing cart: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while clearing the cart');
+        });
+      }
+    }
+    
+    // Add event listeners when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Quantity decrease buttons
+      document.querySelectorAll('.decrease-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const itemElement = this.closest('.cart-item');
+          const itemId = itemElement.dataset.itemId;
+          const quantityInput = itemElement.querySelector('.quantity-input');
+          let quantity = parseInt(quantityInput.value) - 1;
+          
+          if (quantity >= 1) {
+            quantityInput.value = quantity;
+            updateCartItem(itemId, quantity);
+          } else if (quantity === 0) {
+            // Remove item if quantity is 0
+            if (confirm('Remove this item from your cart?')) {
+              removeCartItem(itemId);
+            } else {
+              // Reset to 1 if user cancels
+              quantityInput.value = 1;
+            }
+          }
+        });
+      });
+      
+      // Quantity increase buttons
+      document.querySelectorAll('.increase-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const itemElement = this.closest('.cart-item');
+          const itemId = itemElement.dataset.itemId;
+          const quantityInput = itemElement.querySelector('.quantity-input');
+          let quantity = parseInt(quantityInput.value) + 1;
+          
+          quantityInput.value = quantity;
+          updateCartItem(itemId, quantity);
+        });
+      });
+      
+      // Remove item buttons
+      document.querySelectorAll('.remove-item-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const itemElement = this.closest('.cart-item');
+          const itemId = itemElement.dataset.itemId;
+          
+          if (confirm('Remove this item from your cart?')) {
+            removeCartItem(itemId);
+          }
+        });
+      });
+      
+      // Clear cart button
+      const clearCartBtn = document.getElementById('clear-cart-btn');
+      if (clearCartBtn) {
+        clearCartBtn.addEventListener('click', clearCart);
+      }
+    });
+  </script>
+</body>
+</html>

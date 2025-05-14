@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .restaurant-banner {
+      height: 300px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .restaurant-banner-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0));
+      color: white;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+    .restaurant-info-card {
+      margin-top: -50px;
+      position: relative;
+      z-index: 10;
+    }
+    .menu-category {
+      padding-top: 60px;
+      margin-top: -50px;
+    }
+    .menu-item-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .menu-item-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .category-nav {
+      position: sticky;
+      top: 70px;
+      z-index: 100;
+      background-color: white;
+      padding: 10px 0;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .category-nav .nav-link {
+      color: #6c757d;
+      padding: 8px 16px;
+      border-radius: 20px;
+      margin-right: 10px;
+    }
+    .category-nav .nav-link.active {
+      background-color: #007bff;
+      color: white;
+    }
+    .dietary-badge {
+      font-size: 0.7rem;
+      padding: 3px 6px;
+      margin-right: 5px;
+    }
+    .spicy-level {
+      display: inline-block;
+    }
+    .spicy-level i {
+      color: #dc3545;
+      font-size: 0.8rem;
+    }
+    .add-to-cart-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #198754;
+      color: white;
+      border: none;
+      transition: all 0.3s ease;
+    }
+    .add-to-cart-btn:hover {
+      transform: scale(1.1);
+      background-color: #157347;
+    }
+  </style>
+</head>
+<body>
+  {{> navbar}}
+
+  <div class="restaurant-banner" style="background-image: url('{{restaurant.image}}');">
+    <div class="restaurant-banner-overlay">
+      <h1>{{restaurant.name}}</h1>
+      <p class="mb-0">{{restaurant.cuisine}} • {{restaurant.location}}</p>
+    </div>
+  </div>
+
+  <div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Menu for {{restaurant.name}}</h2>
+      <a href="/add-menu-item/{{restaurant._id}}" class="btn btn-primary" id="addMenuItemBtn">
+        <i class="fas fa-plus-circle me-2"></i> Add Menu Item
+      </a>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card restaurant-info-card mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <span class="badge bg-{{#if (eq restaurant.status "Open")}}success{{else}}danger{{/if}} me-2">
+                  {{restaurant.status}}
+                </span>
+                <span class="me-3">
+                  <i class="fas fa-star text-warning"></i> {{restaurant.rating}}
+                </span>
+                <span class="text-muted">{{restaurant.priceRange}}</span>
+              </div>
+              <div>
+                <button class="btn btn-outline-primary btn-sm me-2">
+                  <i class="far fa-heart me-1"></i> Save
+                </button>
+                <button class="btn btn-outline-secondary btn-sm">
+                  <i class="fas fa-share-alt me-1"></i> Share
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-clock text-primary me-2"></i>
+                  <div>
+                    <h6 class="mb-0">Delivery Time</h6>
+                    <p class="text-muted mb-0">30-45 min</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-motorcycle text-success me-2"></i>
+                  <div>
+                    <h6 class="mb-0">Delivery Fee</h6>
+                    <p class="text-muted mb-0">${{restaurant.deliveryInfo.deliveryFee}}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-shopping-bag text-danger me-2"></i>
+                  <div>
+                    <h6 class="mb-0">Min. Order</h6>
+                    <p class="text-muted mb-0">${{restaurant.deliveryInfo.minimumOrderAmount}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="category-nav mb-4">
+          <ul class="nav">
+            {{#each categories}}
+              <li class="nav-item">
+                <a class="nav-link {{#if @first}}active{{/if}}" href="#{{this}}">{{this}}</a>
+              </li>
+            {{/each}}
+          </ul>
+        </div>
+
+        {{#each categories}}
+          <div id="{{this}}" class="menu-category">
+            <h3 class="mb-4">{{this}}</h3>
+            <div class="row">
+              {{#each (lookup ../groupedMenuItems this)}}
+                <div class="col-md-6 mb-4">
+                  <div class="card menu-item-card h-100" data-menu-id="{{this._id}}">
+                    <div class="row g-0">
+                      <div class="col-4">
+                        <img src="{{this.image}}" class="img-fluid rounded-start h-100" style="object-fit: cover;" alt="{{this.name}}">
+                      </div>
+                      <div class="col-8">
+                        <div class="card-body">
+                          <h5 class="card-title">{{this.name}}</h5>
+                          <p class="card-text small">{{truncate this.description 80}}</p>
+
+                          <div class="mb-2">
+                            {{#if this.dietaryInfo.isVegetarian}}
+                              <span class="badge bg-success dietary-badge">Vegetarian</span>
+                            {{/if}}
+                            {{#if this.dietaryInfo.isVegan}}
+                              <span class="badge bg-success dietary-badge">Vegan</span>
+                            {{/if}}
+                            {{#if this.dietaryInfo.isGlutenFree}}
+                              <span class="badge bg-warning dietary-badge">Gluten-Free</span>
+                            {{/if}}
+                            {{#if this.dietaryInfo.containsNuts}}
+                              <span class="badge bg-danger dietary-badge">Contains Nuts</span>
+                            {{/if}}
+
+                            {{#if this.spicyLevel}}
+                              <span class="spicy-level">
+                                {{#times this.spicyLevel}}
+                                  <i class="fas fa-pepper-hot"></i>
+                                {{/times}}
+                              </span>
+                            {{/if}}
+                          </div>
+
+                          <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">${{this.price}}</span>
+                            {{#if this.averageRating}}
+                              <span class="text-warning">
+                                <i class="fas fa-star"></i> {{this.averageRating}}
+                              </span>
+                            {{/if}}
+                          </div>
+
+                          <button class="add-to-cart-btn" data-menu-id="{{this._id}}" data-menu-name="{{this.name}}" data-menu-price="{{this.price}}">
+                            <i class="fas fa-plus"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+
+      <div class="col-md-4">
+        <div class="card mb-4 position-sticky" style="top: 80px;">
+          <div class="card-header">
+            <h5 class="mb-0">Your Cart</h5>
+          </div>
+          <div class="card-body">
+            <div id="cart-items">
+              <div class="text-center py-4" id="empty-cart-message">
+                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                <p>Your cart is empty</p>
+                <p class="text-muted small">Add items from the menu to get started</p>
+              </div>
+            </div>
+
+            <div id="cart-summary" style="display: none;">
+              <hr>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Subtotal:</span>
+                <span id="cart-subtotal">$0.00</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Delivery Fee:</span>
+                <span>${{restaurant.deliveryInfo.deliveryFee}}</span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between mb-3">
+                <strong>Total:</strong>
+                <strong id="cart-total">$0.00</strong>
+              </div>
+
+              <a href="/cart" class="btn btn-success w-100">
+                <i class="fas fa-shopping-cart me-2"></i> View Cart
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Restaurant Info</h5>
+          </div>
+          <div class="card-body">
+            <p class="mb-2"><i class="fas fa-map-marker-alt me-2 text-danger"></i> {{restaurant.location}}</p>
+            <p class="mb-2"><i class="fas fa-phone-alt me-2 text-primary"></i> (123) 456-7890</p>
+            <p class="mb-0"><i class="fas fa-clock me-2 text-success"></i> Open: 10:00 AM - 10:00 PM</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Reviews</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <div class="me-3">
+                <span class="display-4">{{restaurant.rating}}</span>
+              </div>
+              <div>
+                <div class="text-warning mb-1">
+                  {{#times (floor restaurant.rating)}}
+                    <i class="fas fa-star"></i>
+                  {{/times}}
+                  {{#if (decimal restaurant.rating)}}
+                    <i class="fas fa-star-half-alt"></i>
+                  {{/if}}
+                  {{#times (subtract 5 (ceiling restaurant.rating))}}
+                    <i class="far fa-star"></i>
+                  {{/times}}
+                </div>
+                <p class="text-muted mb-0">Based on {{restaurant.totalReviews}} reviews</p>
+              </div>
+            </div>
+
+            <a href="#" class="btn btn-outline-primary btn-sm w-100">
+              <i class="fas fa-comment-alt me-2"></i> Read Reviews
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add to Cart Modal -->
+  <div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addToCartModalLabel">Add to Cart</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="item-quantity" class="form-label">Quantity</label>
+            <input type="number" class="form-control" id="item-quantity" min="1" value="1">
+          </div>
+          <div class="mb-3">
+            <label for="special-instructions" class="form-label">Special Instructions (Optional)</label>
+            <textarea class="form-control" id="special-instructions" rows="3" placeholder="E.g., No onions, extra spicy, etc."></textarea>
+          </div>
+          <input type="hidden" id="menu-item-id">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" id="confirm-add-to-cart">
+            <i class="fas fa-cart-plus me-2"></i> Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Restaurant Closed Modal -->
+  <div class="modal fade" id="restaurantClosedModal" tabindex="-1" aria-labelledby="restaurantClosedModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="restaurantClosedModalLabel">Restaurant Closed</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <i class="fas fa-store-slash fa-4x text-danger mb-3"></i>
+          <h4>Sorry, this restaurant is currently closed</h4>
+          <p class="text-muted">Please check back during operating hours</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Different Restaurant Modal -->
+  <div class="modal fade" id="differentRestaurantModal" tabindex="-1" aria-labelledby="differentRestaurantModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="differentRestaurantModalLabel">Clear Cart?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Your cart contains items from a different restaurant. Would you like to clear your cart and add this item?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="clear-cart-and-add">Clear Cart & Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{> footer}}
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Add event listener to the Add Menu Item button
+    document.getElementById('addMenuItemBtn').addEventListener('click', function(e) {
+      console.log('Add Menu Item button clicked');
+      const url = this.getAttribute('href');
+      console.log('Navigating to:', url);
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Category navigation
+      const categoryLinks = document.querySelectorAll('.category-nav .nav-link');
+      categoryLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+
+          // Remove active class from all links
+          categoryLinks.forEach(l => l.classList.remove('active'));
+
+          // Add active class to clicked link
+          this.classList.add('active');
+
+          // Scroll to category
+          const categoryId = this.getAttribute('href');
+          const categoryElement = document.querySelector(categoryId);
+
+          window.scrollTo({
+            top: categoryElement.offsetTop - 100,
+            behavior: 'smooth'
+          });
+        });
+      });
+
+      // Add to cart functionality
+      const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
+      const addToCartModal = new bootstrap.Modal(document.getElementById('addToCartModal'));
+      const restaurantClosedModal = new bootstrap.Modal(document.getElementById('restaurantClosedModal'));
+      const differentRestaurantModal = new bootstrap.Modal(document.getElementById('differentRestaurantModal'));
+
+      let currentMenuItemId = null;
+      let currentMenuItemData = null;
+
+      // Check if restaurant is open
+      const isRestaurantOpen = {{#if (eq restaurant.status "Open")}}true{{else}}false{{/if}};
+
+      addToCartBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+
+          if (!isRestaurantOpen) {
+            restaurantClosedModal.show();
+            return;
+          }
+
+          currentMenuItemId = this.dataset.menuId;
+          currentMenuItemData = {
+            name: this.dataset.menuName,
+            price: parseFloat(this.dataset.menuPrice)
+          };
+
+          // Reset modal fields
+          document.getElementById('item-quantity').value = 1;
+          document.getElementById('special-instructions').value = '';
+          document.getElementById('menu-item-id').value = currentMenuItemId;
+
+          // Update modal title
+          document.getElementById('addToCartModalLabel').textContent = `Add ${currentMenuItemData.name} to Cart`;
+
+          addToCartModal.show();
+        });
+      });
+
+      // Menu item card click
+      const menuItemCards = document.querySelectorAll('.menu-item-card');
+      menuItemCards.forEach(card => {
+        card.addEventListener('click', function() {
+          const menuItemId = this.dataset.menuId;
+          window.location.href = `/menu/${menuItemId}`;
+        });
+      });
+
+      // Confirm add to cart
+      document.getElementById('confirm-add-to-cart').addEventListener('click', function() {
+        const quantity = parseInt(document.getElementById('item-quantity').value);
+        const specialInstructions = document.getElementById('special-instructions').value;
+
+        addItemToCart(currentMenuItemId, quantity, specialInstructions);
+      });
+
+      // Clear cart and add new item
+      document.getElementById('clear-cart-and-add').addEventListener('click', function() {
+        const quantity = parseInt(document.getElementById('item-quantity').value);
+        const specialInstructions = document.getElementById('special-instructions').value;
+
+        clearCartAndAddItem(currentMenuItemId, quantity, specialInstructions);
+        differentRestaurantModal.hide();
+      });
+
+      // Add item to cart
+      function addItemToCart(menuItemId, quantity, specialInstructions) {
+        fetch('/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            menuItemId,
+            quantity,
+            specialInstructions
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Close modal
+            addToCartModal.hide();
+
+            // Update cart count in navbar
+            document.getElementById('cart-count').textContent = data.cartItemCount;
+
+            // Update cart in sidebar
+            updateCartDisplay(data);
+
+            // Show success message
+            alert(data.message);
+          } else if (data.requiresConfirmation) {
+            // Show different restaurant modal
+            addToCartModal.hide();
+            document.getElementById('differentRestaurantModalLabel').textContent = `Clear items from ${data.restaurantName}?`;
+            differentRestaurantModal.show();
+          } else {
+            alert('Error adding item to cart: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while adding the item to cart');
+        });
+      }
+
+      // Clear cart and add new item
+      function clearCartAndAddItem(menuItemId, quantity, specialInstructions) {
+        fetch('/cart/clear-and-add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            menuItemId,
+            quantity,
+            specialInstructions
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update cart count in navbar
+            document.getElementById('cart-count').textContent = data.cartItemCount;
+
+            // Update cart in sidebar
+            updateCartDisplay(data);
+
+            // Show success message
+            alert(data.message);
+          } else {
+            alert('Error adding item to cart: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while adding the item to cart');
+        });
+      }
+
+      // Update cart display
+      function updateCartDisplay(data) {
+        const cartItems = document.getElementById('cart-items');
+        const cartSummary = document.getElementById('cart-summary');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+        const cartSubtotal = document.getElementById('cart-subtotal');
+        const cartTotal = document.getElementById('cart-total');
+
+        // Show cart summary
+        cartSummary.style.display = 'block';
+        emptyCartMessage.style.display = 'none';
+
+        // Update subtotal and total
+        cartSubtotal.textContent = `$${data.cartSubtotal.toFixed(2)}`;
+
+        // Calculate total (subtotal + delivery fee)
+        const deliveryFee = {{restaurant.deliveryInfo.deliveryFee}};
+        const total = data.cartSubtotal + deliveryFee;
+        cartTotal.textContent = `$${total.toFixed(2)}`;
+      }
+    });
+  </script>
+</body>
+</html>

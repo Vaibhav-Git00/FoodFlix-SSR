@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .payment-method-card {
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .payment-method-card.selected {
+      border-color: #198754;
+      background-color: #f8f9fa;
+    }
+    .address-card {
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .address-card.selected {
+      border-color: #198754;
+      background-color: #f8f9fa;
+    }
+    .order-type-btn {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 10px;
+      border: 2px solid #dee2e6;
+      border-radius: 5px;
+      background-color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .order-type-btn.selected {
+      border-color: #198754;
+      background-color: #f8f9fa;
+    }
+    .order-type-btn i {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  {{> navbar}}
+  
+  <div class="container mt-4 mb-5">
+    <h1 class="mb-4">Checkout</h1>
+    
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Order Type</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="order-type-btn text-center selected" data-order-type="Delivery">
+                  <i class="fas fa-truck d-block text-primary"></i>
+                  <h5>Delivery</h5>
+                  <p class="text-muted mb-0">Delivered to your address</p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="order-type-btn text-center" data-order-type="Pickup">
+                  <i class="fas fa-shopping-bag d-block text-success"></i>
+                  <h5>Pickup</h5>
+                  <p class="text-muted mb-0">Collect from restaurant</p>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="order-type-btn text-center" data-order-type="Dine-in">
+                  <i class="fas fa-utensils d-block text-danger"></i>
+                  <h5>Dine-in</h5>
+                  <p class="text-muted mb-0">Reserve a table</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="delivery-address-section" class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Delivery Address</h5>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+              <i class="fas fa-plus-circle me-1"></i> Add New Address
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              {{#if addresses.length}}
+                {{#each addresses}}
+                  <div class="col-md-6 mb-3">
+                    <div class="card address-card {{#if this.isDefault}}selected{{/if}}" data-address-id="{{this._id}}">
+                      <div class="card-body">
+                        <h6>{{this.label}}</h6>
+                        <p class="mb-1">{{this.street}}</p>
+                        <p class="mb-1">{{this.city}}, {{this.state}} {{this.zipCode}}</p>
+                        {{#if this.isDefault}}
+                          <span class="badge bg-success">Default</span>
+                        {{/if}}
+                      </div>
+                    </div>
+                  </div>
+                {{/each}}
+              {{else}}
+                <div class="col-12">
+                  <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    You don't have any saved addresses. Please add a delivery address.
+                  </div>
+                </div>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+        
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Payment Method</h5>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+              <i class="fas fa-plus-circle me-1"></i> Add New Payment Method
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              {{#if paymentMethods.length}}
+                {{#each paymentMethods}}
+                  <div class="col-md-6 mb-3">
+                    <div class="card payment-method-card {{#if this.isDefault}}selected{{/if}}" data-payment-id="{{this._id}}">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center">
+                          {{#if (eq this.type "Credit Card")}}
+                            <i class="fab fa-cc-visa fa-2x me-3 text-primary"></i>
+                          {{else if (eq this.type "Debit Card")}}
+                            <i class="fab fa-cc-mastercard fa-2x me-3 text-danger"></i>
+                          {{else}}
+                            <i class="fas fa-wallet fa-2x me-3 text-success"></i>
+                          {{/if}}
+                          <div>
+                            <h6>{{this.type}}</h6>
+                            <p class="mb-0">**** **** **** {{this.lastFourDigits}}</p>
+                            {{#if this.isDefault}}
+                              <span class="badge bg-success">Default</span>
+                            {{/if}}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {{/each}}
+              {{else}}
+                <div class="col-12">
+                  <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    You don't have any saved payment methods. Please add a payment method.
+                  </div>
+                </div>
+              {{/if}}
+              
+              <div class="col-md-6 mb-3">
+                <div class="card payment-method-card" data-payment-method="Cash">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-money-bill-wave fa-2x me-3 text-success"></i>
+                      <div>
+                        <h6>Cash on Delivery</h6>
+                        <p class="mb-0">Pay when you receive your order</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Special Instructions</h5>
+          </div>
+          <div class="card-body">
+            <textarea class="form-control" id="special-instructions" rows="3" placeholder="Any special instructions for your order?"></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Order Summary</h5>
+          </div>
+          <div class="card-body">
+            <p class="mb-2">From: <strong>{{restaurant.name}}</strong></p>
+            
+            <div class="mb-3">
+              {{#each cart.items}}
+                <div class="d-flex justify-content-between mb-2">
+                  <span>{{this.quantity}}x {{this.name}}</span>
+                  <span>${{multiply this.price this.quantity}}</span>
+                </div>
+              {{/each}}
+            </div>
+            
+            <hr>
+            
+            <div class="d-flex justify-content-between mb-2">
+              <span>Subtotal:</span>
+              <span>${{cart.subtotal}}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Delivery Fee:</span>
+              <span>${{deliveryFee}}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Tax (8%):</span>
+              <span>${{taxAmount}}</span>
+            </div>
+            
+            <div class="mb-3">
+              <label for="tip-amount" class="form-label">Tip Amount:</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" class="form-control" id="tip-amount" min="0" step="0.5" value="0">
+              </div>
+            </div>
+            
+            <hr>
+            
+            <div class="d-flex justify-content-between mb-3">
+              <strong>Total:</strong>
+              <strong id="total-amount">${{totalAmount}}</strong>
+            </div>
+            
+            <button id="place-order-btn" class="btn btn-success w-100">
+              <i class="fas fa-check-circle me-2"></i> Place Order
+            </button>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-body">
+            <h6><i class="fas fa-shield-alt text-success me-2"></i> Secure Checkout</h6>
+            <p class="text-muted small mb-0">Your payment information is processed securely. We do not store credit card details nor have access to your credit card information.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add Address Modal -->
+  <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="add-address-form">
+            <div class="mb-3">
+              <label for="address-label" class="form-label">Address Label</label>
+              <select class="form-select" id="address-label" required>
+                <option value="Home">Home</option>
+                <option value="Work">Work</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="street" class="form-label">Street Address</label>
+              <input type="text" class="form-control" id="street" required>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="city" class="form-label">City</label>
+                <input type="text" class="form-control" id="city" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="state" class="form-label">State</label>
+                <input type="text" class="form-control" id="state" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="zipcode" class="form-label">Zip Code</label>
+              <input type="text" class="form-control" id="zipcode" required>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="set-default-address">
+              <label class="form-check-label" for="set-default-address">
+                Set as default address
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="save-address-btn">Save Address</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add Payment Method Modal -->
+  <div class="modal fade" id="addPaymentModal" tabindex="-1" aria-labelledby="addPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addPaymentModalLabel">Add Payment Method</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="add-payment-form">
+            <div class="mb-3">
+              <label for="payment-type" class="form-label">Payment Type</label>
+              <select class="form-select" id="payment-type" required>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Digital Wallet">Digital Wallet</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="card-number" class="form-label">Card Number</label>
+              <input type="text" class="form-control" id="card-number" placeholder="**** **** **** ****" required>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="expiry-date" class="form-label">Expiry Date</label>
+                <input type="text" class="form-control" id="expiry-date" placeholder="MM/YY" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="cvv" class="form-label">CVV</label>
+                <input type="text" class="form-control" id="cvv" placeholder="***" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="name-on-card" class="form-label">Name on Card</label>
+              <input type="text" class="form-control" id="name-on-card" required>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="set-default-payment">
+              <label class="form-check-label" for="set-default-payment">
+                Set as default payment method
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="save-payment-btn">Save Payment Method</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  {{> footer}}
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Order type selection
+      const orderTypeBtns = document.querySelectorAll('.order-type-btn');
+      const deliveryAddressSection = document.getElementById('delivery-address-section');
+      
+      orderTypeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          // Remove selected class from all buttons
+          orderTypeBtns.forEach(b => b.classList.remove('selected'));
+          
+          // Add selected class to clicked button
+          this.classList.add('selected');
+          
+          // Show/hide delivery address section based on order type
+          const orderType = this.dataset.orderType;
+          if (orderType === 'Delivery') {
+            deliveryAddressSection.style.display = 'block';
+          } else {
+            deliveryAddressSection.style.display = 'none';
+          }
+        });
+      });
+      
+      // Address selection
+      const addressCards = document.querySelectorAll('.address-card');
+      
+      addressCards.forEach(card => {
+        card.addEventListener('click', function() {
+          // Remove selected class from all cards
+          addressCards.forEach(c => c.classList.remove('selected'));
+          
+          // Add selected class to clicked card
+          this.classList.add('selected');
+        });
+      });
+      
+      // Payment method selection
+      const paymentCards = document.querySelectorAll('.payment-method-card');
+      
+      paymentCards.forEach(card => {
+        card.addEventListener('click', function() {
+          // Remove selected class from all cards
+          paymentCards.forEach(c => c.classList.remove('selected'));
+          
+          // Add selected class to clicked card
+          this.classList.add('selected');
+        });
+      });
+      
+      // Tip amount change
+      const tipInput = document.getElementById('tip-amount');
+      const totalAmountElement = document.getElementById('total-amount');
+      const subtotal = {{cart.subtotal}};
+      const taxAmount = {{taxAmount}};
+      const deliveryFee = {{deliveryFee}};
+      
+      tipInput.addEventListener('change', function() {
+        const tipAmount = parseFloat(this.value) || 0;
+        const totalAmount = subtotal + taxAmount + deliveryFee + tipAmount;
+        totalAmountElement.textContent = '$' + totalAmount.toFixed(2);
+      });
+      
+      // Place order
+      const placeOrderBtn = document.getElementById('place-order-btn');
+      
+      placeOrderBtn.addEventListener('click', function() {
+        // Get selected order type
+        const selectedOrderType = document.querySelector('.order-type-btn.selected').dataset.orderType;
+        
+        // Get selected address ID (if delivery)
+        let addressId = null;
+        if (selectedOrderType === 'Delivery') {
+          const selectedAddress = document.querySelector('.address-card.selected');
+          if (!selectedAddress) {
+            alert('Please select a delivery address');
+            return;
+          }
+          addressId = selectedAddress.dataset.addressId;
+        }
+        
+        // Get selected payment method
+        const selectedPayment = document.querySelector('.payment-method-card.selected');
+        if (!selectedPayment) {
+          alert('Please select a payment method');
+          return;
+        }
+        
+        const paymentMethod = selectedPayment.dataset.paymentId ? 
+          'Credit Card' : selectedPayment.dataset.paymentMethod;
+        
+        // Get special instructions
+        const specialInstructions = document.getElementById('special-instructions').value;
+        
+        // Get tip amount
+        const tipAmount = parseFloat(document.getElementById('tip-amount').value) || 0;
+        
+        // Place order
+        fetch('/orders/place', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            orderType: selectedOrderType,
+            paymentMethod,
+            addressId,
+            specialInstructions,
+            tipAmount
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Redirect to order confirmation page
+            window.location.href = `/orders/confirmation/${data.orderId}`;
+          } else {
+            alert('Error placing order: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while placing your order');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
