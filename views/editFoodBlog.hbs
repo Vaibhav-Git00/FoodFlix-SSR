@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  {{> navbar}}
+  <div class="container mt-4">
+    <h1>Edit Food Blog</h1>
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <form action="/foodblogs/edit/{{foodBlog._id}}" method="POST">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{foodBlog.title}}" required>
+              </div>
+              
+              <div class="mb-3">
+                <label for="content" class="form-label">Content</label>
+                <textarea class="form-control" id="content" name="content" rows="6" required>{{foodBlog.content}}</textarea>
+              </div>
+              
+              <div class="mb-3">
+                <label for="author" class="form-label">Author</label>
+                <input type="text" class="form-control" id="author" name="author" value="{{foodBlog.author}}" required>
+              </div>
+              
+              <div class="mb-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="date" name="date" value="{{formatDate foodBlog.date}}" required>
+              </div>
+              
+              <div class="mb-3">
+                <label for="image" class="form-label">Image URL</label>
+                <input type="text" class="form-control" id="image" name="image" value="{{foodBlog.image}}" required>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category" name="category" required>
+                      <option value="Recipes" {{#if (eq foodBlog.category "Recipes")}}selected{{/if}}>Recipes</option>
+                      <option value="Restaurant Reviews" {{#if (eq foodBlog.category "Restaurant Reviews")}}selected{{/if}}>Restaurant Reviews</option>
+                      <option value="Cooking Tips" {{#if (eq foodBlog.category "Cooking Tips")}}selected{{/if}}>Cooking Tips</option>
+                      <option value="Nutrition" {{#if (eq foodBlog.category "Nutrition")}}selected{{/if}}>Nutrition</option>
+                      <option value="Food Travel" {{#if (eq foodBlog.category "Food Travel")}}selected{{/if}}>Food Travel</option>
+                      <option value="Desserts" {{#if (eq foodBlog.category "Desserts")}}selected{{/if}}>Desserts</option>
+                      <option value="Beverages" {{#if (eq foodBlog.category "Beverages")}}selected{{/if}}>Beverages</option>
+                      <option value="Other" {{#if (eq foodBlog.category "Other")}}selected{{/if}}>Other</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="cuisine" class="form-label">Cuisine</label>
+                    <select class="form-select" id="cuisine" name="cuisine" required>
+                      <option value="Italian" {{#if (eq foodBlog.cuisine "Italian")}}selected{{/if}}>Italian</option>
+                      <option value="Mexican" {{#if (eq foodBlog.cuisine "Mexican")}}selected{{/if}}>Mexican</option>
+                      <option value="Chinese" {{#if (eq foodBlog.cuisine "Chinese")}}selected{{/if}}>Chinese</option>
+                      <option value="Indian" {{#if (eq foodBlog.cuisine "Indian")}}selected{{/if}}>Indian</option>
+                      <option value="Japanese" {{#if (eq foodBlog.cuisine "Japanese")}}selected{{/if}}>Japanese</option>
+                      <option value="Thai" {{#if (eq foodBlog.cuisine "Thai")}}selected{{/if}}>Thai</option>
+                      <option value="French" {{#if (eq foodBlog.cuisine "French")}}selected{{/if}}>French</option>
+                      <option value="American" {{#if (eq foodBlog.cuisine "American")}}selected{{/if}}>American</option>
+                      <option value="Mediterranean" {{#if (eq foodBlog.cuisine "Mediterranean")}}selected{{/if}}>Mediterranean</option>
+                      <option value="Other" {{#if (eq foodBlog.cuisine "Other")}}selected{{/if}}>Other</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="preparationTime" class="form-label">Preparation Time (minutes)</label>
+                    <input type="number" class="form-control" id="preparationTime" name="preparationTime" min="0" value="{{foodBlog.preparationTime}}">
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="difficulty" class="form-label">Difficulty</label>
+                    <select class="form-select" id="difficulty" name="difficulty">
+                      <option value="Easy" {{#if (eq foodBlog.difficulty "Easy")}}selected{{/if}}>Easy</option>
+                      <option value="Medium" {{#if (eq foodBlog.difficulty "Medium")}}selected{{/if}}>Medium</option>
+                      <option value="Hard" {{#if (eq foodBlog.difficulty "Hard")}}selected{{/if}}>Hard</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="ingredients" class="form-label">Ingredients (comma separated)</label>
+                <textarea class="form-control" id="ingredients" name="ingredients" rows="3" placeholder="Ingredient 1, Ingredient 2, Ingredient 3">{{join foodBlog.ingredients}}</textarea>
+              </div>
+              
+              <div class="mb-3">
+                <label for="tags" class="form-label">Tags (comma separated)</label>
+                <input type="text" class="form-control" id="tags" name="tags" value="{{join foodBlog.tags}}" placeholder="tag1, tag2, tag3">
+              </div>
+              
+              <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Update Food Blog</button>
+                <a href="/foodblogs" class="btn btn-secondary">Cancel</a>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {{> footer}}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

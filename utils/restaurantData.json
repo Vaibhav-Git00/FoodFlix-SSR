@@ -16,5 +16,14 @@
     "status": "Closed",
     "image": "https://imgs.search.brave.com/wgjpX0Ax3CgL_jUD1H9WK_368S4uNu63ICgnyfk-_wU/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/ZnJlZS1waG90by9y/ZXN0YXVyYW50LWlu/dGVyaW9yXzExMjct/MzM5NC5qcGc_c2Vt/dD1haXNfaHlicmlk/Jnc9NzQw",
     "id": 3
+  },
+  {
+    "name": "The Elante",
+    "cuisine": "Afganni Food",
+    "rating": "4.8",
+    "location": "UttarPradesh",
+    "status": "Open",
+    "image": "https://imgs.search.brave.com/Lwh6-yC1-l9Igzh-R9oqIgtMyINEE0rPSZcS_BFIoQo/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9yZXNp/emVyLm90c3RhdGlj/LmNvbS92Mi9waG90/b3MveGxhcmdlLzEv/MjQ5MDcwMzUud2Vi/cA",
+    "id": 4
   }
 ]
